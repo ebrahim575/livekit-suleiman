@@ -1,0 +1,43 @@
+# Environment variables
+voice-pipeline-agent-python/.env.local
+voice-assistant-frontend/.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+voice-pipeline-agent-python/.venv/
+voice-pipeline-agent-python/env/
+voice-pipeline-agent-python/venv/
+voice-pipeline-agent-python/ENV/
+voice-pipeline-agent-python/.env
+voice-pipeline-agent-python/.python-version
+voice-pipeline-agent-python/*.log
+
+# Node.js
+voice-assistant-frontend/node_modules/
+voice-assistant-frontend/.next/
+voice-assistant-frontend/.pnp
+voice-assistant-frontend/.pnp.js
+voice-assistant-frontend/coverage
+voice-assistant-frontend/build
+voice-assistant-frontend/dist
+voice-assistant-frontend/.DS_Store
+voice-assistant-frontend/*.log
+voice-assistant-frontend/.env.local
+voice-assistant-frontend/.env.development.local
+voice-assistant-frontend/.env.test.local
+voice-assistant-frontend/.env.production.local
+voice-assistant-frontend/npm-debug.log*
+voice-assistant-frontend/yarn-debug.log*
+voice-assistant-frontend/yarn-error.log*
+
+# General
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+.env.local
