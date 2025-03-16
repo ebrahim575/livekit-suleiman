@@ -4,13 +4,13 @@
 echo "cding into ai-voice-assisant"
 cd ai-voice-assistant
 
-# # Clean install to avoid conflicts
-# echo "Cleaning previous installations..."
-# rm -rf node_modules package-lock.json
+# Clean install to avoid conflicts
+echo "Cleaning previous installations..."
+rm -rf node_modules package-lock.json
 
-# # Install dependencies with legacy peer deps to handle conflicts
-# echo "Installing dependencies..."
-# npm install --legacy-peer-deps
+# Install dependencies with legacy peer deps to handle conflicts
+echo "Installing dependencies..."
+npm install --legacy-peer-deps
 
 # Ensure next is installed globally
 if ! command -v next &> /dev/null; then
