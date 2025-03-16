@@ -70,30 +70,33 @@ export default function VoiceAssistant() {
   }, []);
 
   return (
-    <div className="relative flex flex-col items-center justify-center w-screen h-screen overflow-hidden bg-black">
-      {/* Video Background */}
-      {/*
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover opacity-50"
-      >
-        <source src="/hero-bg.mp4" type="video/mp4" />
-      </video>
-      */}
+    <div className="relative flex flex-col items-center justify-center w-screen h-screen overflow-hidden">
+      {/* Create a gradient background with all three Yaqeen colors */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0052ff]/10 via-white to-[#ff9900]/20"></div>
+      
+      {/* Add diagonal colored stripes for additional visual interest */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -inset-[10%] rotate-12 opacity-[0.07]">
+          <div className="absolute top-0 left-0 w-full h-8 bg-[#0052ff]"></div>
+          <div className="absolute top-24 left-0 w-full h-2 bg-[#ff9900]"></div>
+          <div className="absolute top-40 left-0 w-full h-4 bg-[#0052ff]"></div>
+          <div className="absolute top-64 left-0 w-full h-6 bg-[#ff9900]"></div>
+          <div className="absolute top-96 left-0 w-full h-3 bg-[#0052ff]"></div>
+          <div className="absolute top-[30rem] left-0 w-full h-5 bg-[#ff9900]"></div>
+          <div className="absolute top-[40rem] left-0 w-full h-7 bg-[#0052ff]"></div>
+        </div>
+      </div>
 
-      {/* Terminator-style scan lines */}
-      <div className="absolute inset-0 bg-[url('/scanlines.svg')] opacity-10 pointer-events-none z-10"></div>
+      {/* Light pattern background */}
+      <div className="absolute inset-0 bg-[url('/pattern-light.svg')] opacity-10 pointer-events-none z-10"></div>
 
       {/* Background effects */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Red targeting grid lines */}
+        {/* Grid lines - using specified Yaqeen blue and orange */}
         {gridLines.map((line, i) => (
           <motion.div
             key={i}
-            className="absolute h-0.5 bg-gradient-to-r from-transparent via-purple-600/30 to-transparent"
+            className={`absolute h-0.5 bg-gradient-to-r from-transparent ${i % 3 === 0 ? 'via-[#ff9900]/20' : 'via-[#0052ff]/20'} to-transparent`}
             style={{
               top: `${line.top}%`,
               left: "50%",
@@ -101,8 +104,8 @@ export default function VoiceAssistant() {
               transform: `translateX(-50%) rotate(${line.rotate}deg)`,
             }}
             animate={{
-              opacity: [0.1, 0.3, 0.1],
-              width: [`${line.width}%`, `${line.width + 50}%`],
+              opacity: [0.1, 0.2, 0.1],
+              width: [`${line.width}%`, `${line.width + 20}%`],
             }}
             transition={{
               duration: 3 + Math.random() * 5,
@@ -113,26 +116,29 @@ export default function VoiceAssistant() {
           />
         ))}
 
-        {/* Circular targeting elements */}
+        {/* Circular elements - using specified Yaqeen colors */}
         <motion.div
-          className="absolute top-1/2 left-1/2 w-[500px] h-[500px] border border-purple-600/20 rounded-full"
+          className="absolute top-1/2 left-1/2 w-[500px] h-[500px] border border-[#0052ff]/15 rounded-full"
           style={{ transform: "translate(-50%, -50%)" }}
           animate={{ scale: [1, 1.05, 1] }}
           transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY }}
         />
         <motion.div
-          className="absolute top-1/2 left-1/2 w-[400px] h-[400px] border border-purple-600/15 rounded-full"
+          className="absolute top-1/2 left-1/2 w-[400px] h-[400px] border border-[#ff9900]/25 rounded-full"
           style={{ transform: "translate(-50%, -50%)" }}
           animate={{ scale: [1.05, 1, 1.05] }}
           transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY }}
         />
         <motion.div
-          className="absolute top-1/2 left-1/2 w-[300px] h-[300px] border border-purple-600/10 rounded-full"
+          className="absolute top-1/2 left-1/2 w-[300px] h-[300px] border border-[#0052ff]/15 rounded-full"
           style={{ transform: "translate(-50%, -50%)" }}
           animate={{ scale: [1, 1.1, 1] }}
           transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY }}
         />
       </div>
+
+      {/* Radial gradient overlay for depth */}
+      <div className="absolute inset-0 bg-radial-gradient from-transparent to-white/50"></div>
 
       <LiveKitRoom
         token={connectionDetails?.participantToken}
@@ -146,37 +152,24 @@ export default function VoiceAssistant() {
         }}
         className="relative z-20 flex flex-col items-center justify-center"
       >
+        <div className="text-2xl text-[#0052ff] tracking-wider mb-8 font-prata">
+          <span className="text-[#0052ff]">Peace be upon </span>
+          <span className="text-[#ff9900]">you</span>
+        </div>
         <SimpleVoiceAssistant onStateChange={setAgentState} />
         <ControlBar onConnectButtonClicked={onConnectButtonClicked} agentState={agentState} />
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="mt-8 font-prata text-[30px] text-white tracking-wider bg-black/40 px-3 py-1 rounded-md border border-purple-900/30 uppercase"
-          style={{
-            textShadow: '0 0 5px rgba(255, 255, 255, 0.5)',
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '0.05em'
-          }}
-        >
-          {scrambledAddress}
-        </motion.div>
         <RoomAudioRenderer />
       </LiveKitRoom>
 
-      {/* HUD elements */}
-      <div className="absolute bottom-4 left-4 text-white font-prata text-xs uppercase tracking-wider">
-        <div className="bg-black/40 px-2 py-1 rounded-md border border-purple-900/30">SYS:ACTIVE</div>
-        <div className="mt-1 bg-black/40 px-2 py-1 rounded-md border border-purple-900/30">T-800 INTERFACE v1.0</div>
-      </div>
+      {/* Orange decorative corner elements */}
+      <div className="absolute top-4 right-4 w-24 h-1 bg-[#ff9900] rounded-full"></div>
+      <div className="absolute top-4 right-4 w-1 h-24 bg-[#ff9900] rounded-full"></div>
+      <div className="absolute bottom-4 left-4 w-24 h-1 bg-[#ff9900] rounded-full"></div>
+      <div className="absolute bottom-4 left-4 w-1 h-24 bg-[#ff9900] rounded-full"></div>
 
-      <div className="absolute top-4 right-4 text-white font-prata text-[30px] text-right uppercase">
-        <div>Solve Riddle</div>
-        <div>Get CA</div>
-        <div>Ape in</div>
-      </div>
-
-      <div className="absolute bottom-1 right-4 text-white font-prata text-xs opacity-70">
-        not affiliated with ejaaz or aiccelerate
+      {/* Bottom right attribution */}
+      <div className="absolute bottom-1 right-4 text-[#0052ff] font-prata text-xs opacity-70">
+        Not Affiliated with <span className="text-[#ff9900]">Omer Suleiman</span> or Yaqeen Institute
       </div>
     </div>
   );
@@ -197,21 +190,23 @@ function SimpleVoiceAssistant(props: { onStateChange: (state: AgentState) => voi
       transition={{ duration: 0.5 }}
     >
       <motion.div
-        className="w-56 h-56 rounded-full bg-gradient-to-br from-purple-600/50 to-purple-900/50 p-[2px]"
+        className="w-56 h-56 rounded-full bg-gradient-to-br from-[#0052ff]/20 via-white to-[#ff9900]/20 p-[2px] shadow-lg"
         animate={{
-          boxShadow: state !== "disconnected" ? "0 0 30px rgba(147, 51, 234, 0.5)" : "0 0 15px rgba(147, 51, 234, 0.3)",
+          boxShadow: state !== "disconnected" ? "0 0 30px rgba(0, 82, 255, 0.3)" : "0 4px 12px rgba(0, 82, 255, 0.15)",
         }}
         transition={{ duration: 0.5 }}
       >
-        <div className="w-full h-full rounded-full bg-black/80 flex items-center justify-center overflow-hidden border border-purple-800/40">
+        <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden border border-[#0052ff]/20">
           <div className="relative w-full h-full">
             <Image
-              src="/ej.png"
-              alt="Terminator Profile"
+              src="/os.jpg"
+              alt="Profile"
               width={224}
               height={224}
               className="object-cover"
             />
+            {/* Orange accent circle */}
+            <div className="absolute -bottom-1 -right-1 w-12 h-12 rounded-full border-4 border-white bg-[#ff9900]"></div>
           </div>
         </div>
       </motion.div>
@@ -243,16 +238,16 @@ function CustomMicButton() {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.5 }}
-      className="relative z-20 w-16 h-16 rounded-full flex items-center justify-center bg-black border border-purple-800/30 hover:bg-purple-900/30 hover:border-purple-600/50"
+      className="relative z-20 w-16 h-16 rounded-full flex items-center justify-center bg-white border border-[#0052ff]/30 shadow-md hover:bg-[#0052ff]/5 hover:border-[#0052ff]/50"
       onClick={toggleMute}
     >
       {isMuted ? (
-        <MicOff className="w-6 h-6 text-purple-400" />
+        <MicOff className="w-6 h-6 text-[#ff9900]" />
       ) : (
-        <Mic className="w-6 h-6 text-purple-400" />
+        <Mic className="w-6 h-6 text-[#0052ff]" />
       )}
       <motion.div
-        className="absolute inset-0 rounded-full border border-purple-600/50"
+        className="absolute inset-0 rounded-full border border-[#0052ff]/50"
         initial={{ scale: 1, opacity: 1 }}
         animate={{ scale: 1.5, opacity: 0 }}
         transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
@@ -276,12 +271,12 @@ function ControlBar(props: { onConnectButtonClicked: () => void; agentState: Age
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.5 }}
-            className="relative z-20 w-16 h-16 rounded-full flex items-center justify-center bg-black border border-purple-800/30 hover:bg-purple-900/30 hover:border-purple-600/50"
+            className="relative z-20 w-16 h-16 rounded-full flex items-center justify-center bg-white border border-[#0052ff]/30 shadow-md hover:bg-[#0052ff]/5 hover:border-[#0052ff]/50"
             onClick={() => props.onConnectButtonClicked()}
           >
-            <Mic className="w-6 h-6 text-purple-400" />
+            <Mic className="w-6 h-6 text-[#0052ff]" />
             <motion.div
-              className="absolute inset-0 rounded-full border border-purple-600/50"
+              className="absolute inset-0 rounded-full border border-[#ff9900]/50"
               initial={{ scale: 1, opacity: 1 }}
               animate={{ scale: 1.5, opacity: 0 }}
               transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
@@ -295,16 +290,6 @@ function ControlBar(props: { onConnectButtonClicked: () => void; agentState: Age
           <CustomMicButton />
         )}
       </AnimatePresence>
-
-      {/* Status text */}
-      <motion.div
-        className="mt-8 text-white font-prata tracking-wider text-center text-[30px] uppercase"
-        animate={{
-          opacity: props.agentState !== "disconnected" ? 1 : 0.7,
-        }}
-      >
-        {props.agentState !== "disconnected" ? "UNLOCK THE CA" : "UNLOCK THE CA"}
-      </motion.div>
     </div>
   );
 }
