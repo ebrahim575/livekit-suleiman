@@ -1,10 +1,10 @@
 import { AccessToken } from 'livekit-server-sdk';
 import { NextRequest, NextResponse } from 'next/server';
 
-// NOTE: you are expected to define the following environment variables in `.env.local`:
-const API_KEY = process.env.LIVEKIT_API_KEY;
-const API_SECRET = process.env.LIVEKIT_API_SECRET;
-const LIVEKIT_URL = process.env.LIVEKIT_URL;
+// Check both prefixed and non-prefixed environment variables
+const API_KEY = process.env.LIVEKIT_API_KEY || process.env.NEXT_PUBLIC_LIVEKIT_API_KEY;
+const API_SECRET = process.env.LIVEKIT_API_SECRET || process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET;
+const LIVEKIT_URL = process.env.LIVEKIT_URL || process.env.NEXT_PUBLIC_LIVEKIT_URL;
 
 // don't cache the results
 export const revalidate = 0;
@@ -55,19 +55,24 @@ export async function GET() {
   }
 }
 
-function createParticipantToken(userInfo: AccessTokenOptions, roomName: string) {
+function createParticipantToken(userInfo: { identity: string }, roomName: string) {
+  if (!API_KEY || !API_SECRET) {
+    throw new Error('LiveKit configuration is missing');
+  }
+  
   const at = new AccessToken(API_KEY, API_SECRET, {
     ...userInfo,
     ttl: "15m",
   });
-  const grant: VideoGrant = {
+  
+  at.addGrant({
     room: roomName,
     roomJoin: true,
     canPublish: true,
     canPublishData: true,
     canSubscribe: true,
-  };
-  at.addGrant(grant);
+  });
+  
   return at.toJwt();
 }
 

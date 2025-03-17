@@ -69,7 +69,12 @@ export default function VoiceAssistant() {
       const apiSecret = process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET;
 
       if (!liveKitUrl || !apiKey || !apiSecret) {
-        throw new Error('LiveKit configuration is missing');
+        console.error('Missing environment variables:', {
+          NEXT_PUBLIC_LIVEKIT_URL: liveKitUrl,
+          NEXT_PUBLIC_LIVEKIT_API_KEY: apiKey,
+          NEXT_PUBLIC_LIVEKIT_API_SECRET: apiSecret
+        });
+        throw new Error('LiveKit configuration is missing - Please check your environment variables');
       }
 
       const response = await fetch('/api/connection-details', {
