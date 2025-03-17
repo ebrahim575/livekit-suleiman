@@ -21,6 +21,7 @@ export default function VoiceAssistant() {
   const [agentState, setAgentState] = useState<AgentState>("disconnected");
   const [scrambledAddress, setScrambledAddress] = useState("0x2D90785E30A9df6ccE329c0171CB8Ba0f4a5c17b");
   const [gridLines, setGridLines] = useState<Array<{ top: number; width: number; rotate: number }>>([]); 
+  const [isConnecting, setIsConnecting] = useState(false);
   
   const originalAddress = "0x2D90785E30A9df6ccE329c0171CB8Ba0f4a5c17b";
   
@@ -59,15 +60,38 @@ export default function VoiceAssistant() {
     setGridLines(lines);
   }, []);
 
-  const onConnectButtonClicked = useCallback(async () => {
-    const url = new URL(
-      process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? "/api/connection-details",
-      window.location.origin
-    );
-    const response = await fetch(url.toString());
-    const connectionDetailsData = await response.json();
-    updateConnectionDetails(connectionDetailsData);
-  }, []);
+  const onConnectButtonClicked = async () => {
+    try {
+      setIsConnecting(true);
+      // Use LiveKit environment variables directly from Amplify
+      const liveKitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL;
+      const apiKey = process.env.NEXT_PUBLIC_LIVEKIT_API_KEY;
+      const apiSecret = process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET;
+
+      if (!liveKitUrl || !apiKey || !apiSecret) {
+        throw new Error('LiveKit configuration is missing');
+      }
+
+      const response = await fetch('/api/connection-details', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          liveKitUrl,
+          apiKey,
+          apiSecret,
+          identity: 'user',
+          roomName: 'test-room',
+        }),
+      });
+      const connectionDetailsData = await response.json();
+      updateConnectionDetails(connectionDetailsData);
+    } catch (error) {
+      console.error('Error connecting to LiveKit:', error);
+      alert('Error connecting to LiveKit. Please try again later.');
+    }
+  };
 
   return (
     <div className="relative flex flex-col items-center justify-center w-screen h-screen overflow-hidden">
@@ -115,26 +139,6 @@ export default function VoiceAssistant() {
             }}
           />
         ))}
-
-        {/* Circular elements - using specified Yaqeen colors */}
-        <motion.div
-          className="absolute top-1/2 left-1/2 w-[500px] h-[500px] border border-[#0052ff]/15 rounded-full"
-          style={{ transform: "translate(-50%, -50%)" }}
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 w-[400px] h-[400px] border border-[#ff9900]/25 rounded-full"
-          style={{ transform: "translate(-50%, -50%)" }}
-          animate={{ scale: [1.05, 1, 1.05] }}
-          transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 w-[300px] h-[300px] border border-[#0052ff]/15 rounded-full"
-          style={{ transform: "translate(-50%, -50%)" }}
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY }}
-        />
       </div>
 
       {/* Radial gradient overlay for depth */}
@@ -152,8 +156,9 @@ export default function VoiceAssistant() {
         }}
         className="relative z-20 flex flex-col items-center justify-center"
       >
-        <div className="text-2xl text-[#0052ff] tracking-wider mb-8 font-prata">
-          <span className="text-[#0052ff]">Peace be upon </span>
+        <div className="text-2xl tracking-wider mb-8 font-prata">
+          <span className="text-[#0052ff]">Peace </span>
+          <span className="text-white drop-shadow-sm">be upon </span>
           <span className="text-[#ff9900]">you</span>
         </div>
         <SimpleVoiceAssistant onStateChange={setAgentState} />

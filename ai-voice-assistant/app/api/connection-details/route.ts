@@ -1,5 +1,5 @@
-import { AccessToken, AccessTokenOptions, VideoGrant } from "livekit-server-sdk";
-import { NextResponse } from "next/server";
+import { AccessToken } from 'livekit-server-sdk';
+import { NextRequest, NextResponse } from 'next/server';
 
 // NOTE: you are expected to define the following environment variables in `.env.local`:
 const API_KEY = process.env.LIVEKIT_API_KEY;
@@ -69,4 +69,31 @@ function createParticipantToken(userInfo: AccessTokenOptions, roomName: string) 
   };
   at.addGrant(grant);
   return at.toJwt();
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const { liveKitUrl, apiKey, apiSecret, identity, roomName } = await req.json();
+
+    if (!liveKitUrl || !apiKey || !apiSecret || !identity || !roomName) {
+      return NextResponse.json(
+        { error: 'Missing required parameters' },
+        { status: 400 }
+      );
+    }
+
+    const at = new AccessToken(apiKey, apiSecret, { identity });
+    at.addGrant({ roomJoin: true, room: roomName });
+
+    return NextResponse.json({
+      token: at.toJwt(),
+      ws: liveKitUrl,
+    });
+  } catch (error) {
+    console.error('Error generating token:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 } 
