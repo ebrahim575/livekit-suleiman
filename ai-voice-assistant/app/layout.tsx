@@ -11,7 +11,7 @@ const prata = Prata({
 })
 
 export const metadata: Metadata = {
-  title: "Ejaaz AI",
+  title: "Omer Suleiman AI",
   description: "A futuristic AI-powered voice assistant interface",
     generator: 'v0.dev'
 }
