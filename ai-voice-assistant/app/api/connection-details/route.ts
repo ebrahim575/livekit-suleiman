@@ -55,7 +55,7 @@ export async function GET() {
   }
 }
 
-function createParticipantToken(userInfo: { identity: string }, roomName: string) {
+async function createParticipantToken(userInfo: { identity: string }, roomName: string): Promise<string> {
   if (!API_KEY || !API_SECRET) {
     throw new Error('LiveKit configuration is missing');
   }
@@ -101,10 +101,17 @@ export async function POST(req: NextRequest) {
       canSubscribe: true,
     });
 
-    return NextResponse.json({
-      token: at.toJwt(),
-      ws: liveKitUrl,
-    });
+    // Return in the exact format that LiveKitRoom expects
+    const token = await at.toJwt();
+    
+    const data: ConnectionDetails = {
+      serverUrl: liveKitUrl,
+      roomName: roomName,
+      participantName: identity,
+      participantToken: token
+    };
+
+    return NextResponse.json(data);
   } catch (error) {
     console.error('Error generating token:', error);
     return NextResponse.json(

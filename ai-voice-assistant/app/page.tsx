@@ -94,15 +94,13 @@ export default function VoiceAssistant() {
       });
       
       console.log("API response status:", response.status);
+      
+      // Just use the response directly - it already has the right format
       const connectionDetailsData = await response.json();
       console.log("Connection details received");
       
-      updateConnectionDetails({
-        serverUrl: connectionDetailsData.ws,
-        roomName: 'test-room',
-        participantName: 'user',
-        participantToken: connectionDetailsData.token
-      });
+      // Update state with the received data
+      updateConnectionDetails(connectionDetailsData);
       
       setIsConnecting(false);
       console.log("Connection details updated in state");
