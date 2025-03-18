@@ -1,19 +1,3 @@
-import { config } from 'dotenv'
-import path from 'path'
-import { fileURLToPath } from 'url'
-
-// Load .env.local from parent directory
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const parentEnvPath = path.join(__dirname, '..', '.env.local')
-config({ path: parentEnvPath })
-
-let userConfig = undefined
-try {
-  userConfig = await import('./v0-user-next.config')
-} catch (e) {
-  // ignore error
-}
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -35,6 +19,13 @@ const nextConfig = {
     NEXT_PUBLIC_LIVEKIT_API_KEY: process.env.NEXT_PUBLIC_LIVEKIT_API_KEY,
     NEXT_PUBLIC_LIVEKIT_API_SECRET: process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET,
   },
+}
+
+let userConfig = undefined
+try {
+  userConfig = await import('./v0-user-next.config')
+} catch (e) {
+  // ignore error
 }
 
 mergeConfig(nextConfig, userConfig)
