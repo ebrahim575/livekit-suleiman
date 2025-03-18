@@ -159,11 +159,11 @@ async def entrypoint(ctx: JobContext):
                     name="Custom Voice",
                     category="premade",
                     settings=elevenlabs.VoiceSettings(
-                        stability=0.71,
-                        similarity_boost=0.5,
-                        style=0.0,
+                        stability=0.35,
+                        similarity_boost=1.0,
+                        style=0.35,
                         use_speaker_boost=True,
-                        speed=0.925
+                        speed=0.85
                     ),
                 ),
                 language="en",
