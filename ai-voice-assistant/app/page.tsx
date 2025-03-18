@@ -25,17 +25,8 @@ export default function VoiceAssistant() {
   
   const originalAddress = "0x2D90785E30A9df6ccE329c0171CB8Ba0f4a5c17b";
   
-  // Console log environment variables on component mount
-  useEffect(() => {
-    console.log("Environment Variables Check:", {
-      NEXT_PUBLIC_LIVEKIT_URL: process.env.NEXT_PUBLIC_LIVEKIT_URL,
-      NEXT_PUBLIC_LIVEKIT_API_KEY: process.env.NEXT_PUBLIC_LIVEKIT_API_KEY,
-      // Only show first few chars of secret for security
-      NEXT_PUBLIC_LIVEKIT_API_SECRET: process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET ? 
-        `${process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET.substring(0, 4)}...` : undefined
-    });
-  }, []);
-
+  // Remove environment variable console logging for security
+  
   useEffect(() => {
     const scrambleInterval = setInterval(() => {
       const chars = "0123456789abcdefABCDEF";
@@ -81,18 +72,10 @@ export default function VoiceAssistant() {
       const apiKey = process.env.NEXT_PUBLIC_LIVEKIT_API_KEY;
       const apiSecret = process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET;
 
-      console.log("Using LiveKit values:", { 
-        liveKitUrl, 
-        apiKey, 
-        hasSecret: !!apiSecret 
-      });
+      // Remove sensitive logging
 
       if (!liveKitUrl || !apiKey || !apiSecret) {
-        console.error('Missing environment variables:', {
-          NEXT_PUBLIC_LIVEKIT_URL: liveKitUrl,
-          NEXT_PUBLIC_LIVEKIT_API_KEY: apiKey,
-          NEXT_PUBLIC_LIVEKIT_API_SECRET: apiSecret ? "Set but not shown" : undefined
-        });
+        console.error('Missing LiveKit configuration');
         throw new Error('LiveKit configuration is missing - Please check your environment variables');
       }
 
@@ -112,10 +95,7 @@ export default function VoiceAssistant() {
       
       console.log("API response status:", response.status);
       const connectionDetailsData = await response.json();
-      console.log("Connection details received:", {
-        hasToken: !!connectionDetailsData.token,
-        hasUrl: !!connectionDetailsData.ws
-      });
+      console.log("Connection details received");
       
       updateConnectionDetails({
         serverUrl: connectionDetailsData.ws,

@@ -87,8 +87,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const at = new AccessToken(apiKey, apiSecret, { identity });
-    at.addGrant({ roomJoin: true, room: roomName });
+    // Create proper token with all required permissions
+    const at = new AccessToken(apiKey, apiSecret, { 
+      identity,
+      ttl: "15m" 
+    });
+    
+    at.addGrant({
+      room: roomName,
+      roomJoin: true,
+      canPublish: true,
+      canPublishData: true,
+      canSubscribe: true,
+    });
 
     return NextResponse.json({
       token: at.toJwt(),
