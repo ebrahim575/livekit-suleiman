@@ -25,6 +25,17 @@ export default function VoiceAssistant() {
   
   const originalAddress = "0x2D90785E30A9df6ccE329c0171CB8Ba0f4a5c17b";
   
+  // Console log environment variables on component mount
+  useEffect(() => {
+    console.log("Environment Variables Check:", {
+      NEXT_PUBLIC_LIVEKIT_URL: process.env.NEXT_PUBLIC_LIVEKIT_URL,
+      NEXT_PUBLIC_LIVEKIT_API_KEY: process.env.NEXT_PUBLIC_LIVEKIT_API_KEY,
+      // Only show first few chars of secret for security
+      NEXT_PUBLIC_LIVEKIT_API_SECRET: process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET ? 
+        `${process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET.substring(0, 4)}...` : undefined
+    });
+  }, []);
+
   useEffect(() => {
     const scrambleInterval = setInterval(() => {
       const chars = "0123456789abcdefABCDEF";
@@ -63,16 +74,24 @@ export default function VoiceAssistant() {
   const onConnectButtonClicked = async () => {
     try {
       setIsConnecting(true);
+      console.log("Connect button clicked, attempting connection...");
+      
       // Use LiveKit environment variables directly from Amplify
       const liveKitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL;
       const apiKey = process.env.NEXT_PUBLIC_LIVEKIT_API_KEY;
       const apiSecret = process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET;
 
+      console.log("Using LiveKit values:", { 
+        liveKitUrl, 
+        apiKey, 
+        hasSecret: !!apiSecret 
+      });
+
       if (!liveKitUrl || !apiKey || !apiSecret) {
         console.error('Missing environment variables:', {
           NEXT_PUBLIC_LIVEKIT_URL: liveKitUrl,
           NEXT_PUBLIC_LIVEKIT_API_KEY: apiKey,
-          NEXT_PUBLIC_LIVEKIT_API_SECRET: apiSecret
+          NEXT_PUBLIC_LIVEKIT_API_SECRET: apiSecret ? "Set but not shown" : undefined
         });
         throw new Error('LiveKit configuration is missing - Please check your environment variables');
       }
@@ -90,9 +109,25 @@ export default function VoiceAssistant() {
           roomName: 'test-room',
         }),
       });
+      
+      console.log("API response status:", response.status);
       const connectionDetailsData = await response.json();
-      updateConnectionDetails(connectionDetailsData);
+      console.log("Connection details received:", {
+        hasToken: !!connectionDetailsData.token,
+        hasUrl: !!connectionDetailsData.ws
+      });
+      
+      updateConnectionDetails({
+        serverUrl: connectionDetailsData.ws,
+        roomName: 'test-room',
+        participantName: 'user',
+        participantToken: connectionDetailsData.token
+      });
+      
+      setIsConnecting(false);
+      console.log("Connection details updated in state");
     } catch (error) {
+      setIsConnecting(false);
       console.error('Error connecting to LiveKit:', error);
       alert('Error connecting to LiveKit. Please try again later.');
     }
@@ -155,8 +190,16 @@ export default function VoiceAssistant() {
         connect={connectionDetails !== undefined}
         audio={true}
         video={false}
+        onError={(error) => {
+          console.error("LiveKitRoom error:", error);
+          alert(`Connection error: ${error.message}`);
+        }}
+        onConnected={() => {
+          console.log("Successfully connected to LiveKit room!");
+        }}
         onMediaDeviceFailure={onDeviceFailure}
         onDisconnected={() => {
+          console.log("Disconnected from LiveKit room");
           updateConnectionDetails(undefined);
         }}
         className="relative z-20 flex flex-col items-center justify-center"
@@ -167,7 +210,7 @@ export default function VoiceAssistant() {
           <span className="text-[#ff9900]">you</span>
         </div>
         <SimpleVoiceAssistant onStateChange={setAgentState} />
-        <ControlBar onConnectButtonClicked={onConnectButtonClicked} agentState={agentState} />
+        <ControlBar onConnectButtonClicked={onConnectButtonClicked} agentState={agentState} isConnecting={isConnecting} />
         <RoomAudioRenderer />
       </LiveKitRoom>
 
@@ -179,7 +222,7 @@ export default function VoiceAssistant() {
 
       {/* Bottom right attribution */}
       <div className="absolute bottom-1 right-4 text-[#0052ff] font-prata text-xs opacity-70">
-        Not Affiliated with <span className="text-[#ff9900]">Omer Suleiman</span> or Yaqeen Institute
+        Not <span className="text-white">Directly</span> Affiliated with <span className="text-[#ff9900]">Omer Suleiman</span> or <span className="text-white">Beautiful</span> Yaqeen Institute
       </div>
     </div>
   );
@@ -266,7 +309,7 @@ function CustomMicButton() {
   );
 }
 
-function ControlBar(props: { onConnectButtonClicked: () => void; agentState: AgentState }) {
+function ControlBar(props: { onConnectButtonClicked: () => void; agentState: AgentState; isConnecting: boolean }) {
   const krisp = useKrispNoiseFilter();
   useEffect(() => {
     krisp.setNoiseFilterEnabled(true);
@@ -283,8 +326,13 @@ function ControlBar(props: { onConnectButtonClicked: () => void; agentState: Age
             transition={{ duration: 0.5 }}
             className="relative z-20 w-16 h-16 rounded-full flex items-center justify-center bg-white border border-[#0052ff]/30 shadow-md hover:bg-[#0052ff]/5 hover:border-[#0052ff]/50"
             onClick={() => props.onConnectButtonClicked()}
+            disabled={props.isConnecting}
           >
-            <Mic className="w-6 h-6 text-[#0052ff]" />
+            {props.isConnecting ? (
+              <div className="w-6 h-6 border-2 border-[#0052ff] border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <Mic className="w-6 h-6 text-[#0052ff]" />
+            )}
             <motion.div
               className="absolute inset-0 rounded-full border border-[#ff9900]/50"
               initial={{ scale: 1, opacity: 1 }}
@@ -296,7 +344,7 @@ function ControlBar(props: { onConnectButtonClicked: () => void; agentState: Age
       </AnimatePresence>
       
       <AnimatePresence>
-        {props.agentState !== "disconnected" && props.agentState !== "connecting" && (
+        {props.agentState !== "disconnected" && (
           <CustomMicButton />
         )}
       </AnimatePresence>
