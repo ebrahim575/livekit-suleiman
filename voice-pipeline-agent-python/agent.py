@@ -163,7 +163,7 @@ async def entrypoint(ctx: JobContext):
                         similarity_boost=1.0,
                         style=0.35,
                         use_speaker_boost=True,
-                        speed=0.85
+                        speed=0.92
                     ),
                 ),
                 language="en",

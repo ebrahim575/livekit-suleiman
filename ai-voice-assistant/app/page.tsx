@@ -200,7 +200,7 @@ export default function VoiceAssistant() {
 
       {/* Bottom right attribution */}
       <div className="absolute bottom-1 right-4 text-[#0052ff] font-prata text-xs opacity-70">
-        Not <span className="text-white">Directly</span> Affiliated with <span className="text-[#ff9900]">Omer Suleiman</span> or <span className="text-white">Beautiful</span> Yaqeen Institute
+        Not affiliated with Omer Suleiman and Yaqeen Institute
       </div>
     </div>
   );
