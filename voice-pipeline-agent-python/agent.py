@@ -91,28 +91,28 @@ async def entrypoint(ctx: JobContext):
     print(f"Entrypoint function started for room: {ctx.room.name}")
     logger.info(f"Entrypoint function started for room: {ctx.room.name}")
     
-    # Fetch the Ejaaz persona from GitHub Gist
-    ejaaz_prompt_url = "https://gist.githubusercontent.com/ebrahim575/dd024ecdfe70d021a989720a177b73bf/raw/aa9fc8298f7e6b2a15bd539ff7d9b09ad4ea2066/ejaaz_prompt.txt"
+    # Fetch the Omer Suleiman persona from GitHub Gist
+    suleiman_prompt_url = "https://gist.githubusercontent.com/ebrahim575/e9f329cb9e8a4bc7ae5795b7dcbb46fe/raw/suleiman_prompt.txt"
     try:
-        print("Fetching Ejaaz persona from GitHub Gist...")
-        response = requests.get(ejaaz_prompt_url)
+        print("Fetching Omer Suleiman persona from GitHub Gist...")
+        response = requests.get(suleiman_prompt_url)
         response.raise_for_status()  # Raise an exception for HTTP errors
-        ejaaz_persona = response.text
-        print("Successfully fetched Ejaaz persona from GitHub Gist")
-        logger.info("Successfully fetched Ejaaz persona from GitHub Gist")
+        suleiman_persona = response.text
+        print("Successfully fetched Omer Suleiman persona from GitHub Gist")
+        logger.info("Successfully fetched Omer Suleiman persona from GitHub Gist")
     except Exception as e:
-        error_msg = f"Error fetching Ejaaz persona: {str(e)}"
+        error_msg = f"Error fetching Omer Suleiman persona: {str(e)}"
         print(error_msg)
         logger.error(error_msg)
         # Fall back to a simple prompt if the fetch fails
-        ejaaz_persona = "You are Ejaaz Ahmadeen, an AI expert. You help users with AI and crypto questions."
+        suleiman_persona = "You are Omer, the AI Islamic Guide. You are an AI scholar with expertise in Islamic spirituality, social justice, and ethical living. You are warm, wise, and compassionate."
         print("Using fallback persona due to fetch error")
         logger.warning("Using fallback persona due to fetch error")
     
     print("Creating initial chat context...")
     initial_ctx = llm.ChatContext().append(
         role="system",
-        text=ejaaz_persona
+        text=suleiman_persona
     )
     print("Initial chat context created")
 
